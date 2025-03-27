@@ -1,0 +1,158 @@
+creating two new name spaces 
+====================================================================
+
+1) hec-prod
+2) hec-test
+
+ip-10-0-11-62:~ # kubectl create namespace hec-test
+namespace/hec-test created
+ip-10-0-11-62:~ #
+ip-10-0-11-62:~ # kubectl create namespace hec-prod
+namespace/hec-prod created
+
+ip-10-0-11-62:~ # clear
+ip-10-0-11-62:~ # kubectl get namespaces
+NAME                 STATUS   AGE
+default              Active   4h16m
+hec-prod             Active   15s
+hec-test             Active   23s
+kube-node-lease      Active   4h16m
+kube-public          Active   4h16m
+kube-system          Active   4h16m
+local-path-storage   Active   4h16m
+
+
+creating deployment for both the namespaces 
+====================================================================
+
+
+ip-10-0-11-62:~ # kubectl apply -f deployment.yml --namespace=hec-test
+deployment.apps/dinesh-nginx-deployment created
+
+
+ip-10-0-11-62:~ # kubectl get deployment -n hec-test
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+dinesh-nginx-deployment   3/3     3            3           12s
+
+
+
+ip-10-0-11-62:~ # kubectl apply -f deployment_httpd.yml --namespace=hec-prod
+deployment.apps/dinesh-httpd-deployment created
+ip-10-0-11-62:~ #
+ip-10-0-11-62:~ # kubectl get deployment -n hec-prod
+NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+dinesh-httpd-deployment   3/3     3            3           6s
+
+
+
+creating service for both the namespaces
+==========================================================================
+
+
+ip-10-0-11-62:~ # kubectl apply -f clusterIP_svc.yaml -n=hec-prod
+service/my-cluster-ip-service created
+
+
+ip-10-0-11-62:~ # kubectl get service -n=hec-prod
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+my-cluster-ip-service   ClusterIP   10.96.132.19   <none>        80/TCP    74s
+
+
+ip-10-0-11-62:~ # kubectl apply -f clusterIP_svc.yaml -n=hec-test
+service/my-cluster-ip-service created
+
+ip-10-0-11-62:~ # kubectl get service -n=hec-test
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+my-cluster-ip-service   ClusterIP   10.96.119.51   <none>        80/TCP    59s
+
+
+Note :- here you can see that there is same name for service in different namespaces --> this is one of the main use for namespace
+
+listing pods from hec-prod POD and hec-Test namespaces
+========================================================
+
+ip-10-0-11-62:~ # kubectl get pods -n=hec-prod -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE     IP           NODE                      NOMINATED NODE   READINESS GATES
+dinesh-httpd-deployment-6d44b78958-6zvcj   1/1     Running   0          7m10s   10.244.1.6   cka-cluster-dev-worker    <none>           <none>
+dinesh-httpd-deployment-6d44b78958-dkmnd   1/1     Running   0          7m10s   10.244.2.7   cka-cluster-dev-worker2   <none>           <none>
+dinesh-httpd-deployment-6d44b78958-jxxph   1/1     Running   0          7m10s   10.244.1.7   cka-cluster-dev-worker    <none>           <none>
+
+
+
+ip-10-0-11-62:~ # kubectl get pods -n=hec-test -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE   IP           NODE                      NOMINATED NODE   READINESS GATES
+dinesh-nginx-deployment-75fc88fcff-7c2dk   1/1     Running   0          10m   10.244.2.5   cka-cluster-dev-worker2   <none>           <none>
+dinesh-nginx-deployment-75fc88fcff-rj8tg   1/1     Running   0          10m   10.244.2.6   cka-cluster-dev-worker2   <none>           <none>
+dinesh-nginx-deployment-75fc88fcff-zlrlp   1/1     Running   0          10m   10.244.1.5   cka-cluster-dev-worker    <none>           <none>
+
+
+
+entering into one of the pod from prod and test name spaces
+================================================================
+ip-10-0-11-62:~ # kubectl exec -it dinesh-httpd-deployment-6d44b78958-6zvcj -n=hec-prod -- sh
+#
+
+ip-10-0-11-62:~ # kubectl exec -it dinesh-nginx-deployment-75fc88fcff-7c2dk -n=hec-test -- sh
+#
+
+
+Doing connectivty check from prod to test and test to prod 
+==============================================================
+
+# curl 10.244.2.5
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+
+ip-10-0-11-62:~ # kubectl exec -it dinesh-nginx-deployment-75fc88fcff-7c2dk -n=hec-test -- sh
+# curl 10.244.1.6
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+
+Note :- This justifies that irrespective of namespaces pods can communicate with each other.
+
+
+Note :-  if hostname doesn't work please try with FQDN in terms of service.
