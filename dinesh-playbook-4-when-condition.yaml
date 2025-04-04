@@ -1,0 +1,7 @@
+---
+- hosts:  all
+  tasks:
+  - name:  "Environment check"
+    debug:
+      msg:  "This is production enviroment system"
+    when:  ansible_default_ipv4.address == "10.0.1.204" 
