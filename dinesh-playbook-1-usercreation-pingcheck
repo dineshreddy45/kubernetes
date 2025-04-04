@@ -8,10 +8,10 @@
 
   - name: Using the user module to created a user named sap in all the environments
     user:
-    name: sap
-    shell: /bin/bash
+      name: sap
+      shell: /bin/bash
 
   - name: copying the existing contents in the target machine
     command: |
-    touch file1
-    cp /root/ansible/inventory file1
+      touch file1
+      cp /root/ansible/inventory file1
