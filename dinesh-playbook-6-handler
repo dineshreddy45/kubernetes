@@ -1,0 +1,22 @@
+---
+- hosts:  all
+  gather_facts:  false
+  tasks:
+  - name:  "Handler use case"
+    zypper:
+      name:  apache2
+      state:  installed
+    notify:  Service installed
+
+  handlers:
+  - name:  Service installed
+    service:
+      name:  apache2
+      state:  started
+
+# some important points about handlers
+#1) they will execute only after completion of all the main tasks
+#2) they will execute in sequence 
+#3) if we call same handlers multiple times then it will execute only one time
+#4) A handler should have a globally unique name in the playbook
+#5) if multiple handlers are defined with same name then only one handler will be called.
