@@ -1,0 +1,23 @@
+---
+- hosts:  all
+  gather_facts:  false
+  tasks:
+  - name:  "simple or standard loop"
+    zypper:
+      name:  "{{ item }}"
+      state:  installed
+    loop: [ vsftpd, tree, net-tools ]
+  
+  - name: "Hash loops for multi user installations"
+    user:
+      name:  "{{ item.name }}"
+      uid:  "{{ item.uid }}"
+      shell:  "{{ item.shell }}"
+      home:  "{{ item.home }}"
+      state:  present
+    loop:
+    - {name: harry, uid: 5050, shell: /bin/bash, home: /home/harry}
+    - {name: bob, uid: 5051, shell: /bin/bash, home: /home/bob}
+    - {name: jack, uid: 5052, shell: /bin/bash, home: /home/jack}
+
+#NOTE :- Here we are using [] braces in simple loop because there is only one item name so we are taking it as list, we are using {} this in hash loop because there are multiple variables and we are consindering them as key value pair like dictonary.
