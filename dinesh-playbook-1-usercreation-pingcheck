@@ -14,4 +14,8 @@
   - name: copying the existing contents in the target machine
     command: |
       touch file1
-      cp /root/ansible/inventory file1
+  
+  - name:  Doing data copy
+    copy:
+      src:  /root/ansible/inventory
+      dest:  /root/file1
