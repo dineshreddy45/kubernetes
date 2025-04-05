@@ -1,0 +1,5 @@
+---
+- hosts:  DEV
+  tasks:
+  roles:
+  - /root/ansible/dinesh-role-rsyslog
