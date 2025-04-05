@@ -1,2 +1,3 @@
 ---
 # defaults file for dinesh-role-rsyslog
+log_server_ip: 10.0.11.62

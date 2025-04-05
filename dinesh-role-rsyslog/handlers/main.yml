@@ -1,2 +1,7 @@
 ---
 # handlers file for dinesh-role-rsyslog
+- name:  Restart Rsyslog
+  service:
+    name:  rsyslog
+    state:  restarted
+    
