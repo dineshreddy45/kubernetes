@@ -1,0 +1,6 @@
+---
+-  name:  "install apache2 service on dev enivornment"
+   zypper:
+     name:  apache2
+     state:  installed
+   notify:  Start Apache
