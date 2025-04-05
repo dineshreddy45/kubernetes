@@ -1,0 +1,16 @@
+---
+- hosts:  all
+  vars: 
+    list:
+    - git
+    - docker
+  tasks:
+ 
+  - name: "template module usage"
+    template:
+      src:  /root/ansible/dynamic-package-installation.j2
+      dest:  /test
+      mode:  777
+
+  - name:  "shell module for installation"
+    shell:  sh /test

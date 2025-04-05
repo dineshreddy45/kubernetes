@@ -1,0 +1,5 @@
+{% if ansible_nodename == "ip-10-0-11-248" %}
+{% for item in list %}
+zypper -n install {{ item }}
+{% endfor %}
+{% endif %}
