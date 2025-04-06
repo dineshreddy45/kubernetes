@@ -1,0 +1,14 @@
+---
+- name:  "postchecks of commands before patching"
+  shell:  |
+    touch /tmp/postcheck.txt
+    {
+      echo "====================================================="
+      echo "COMMAND:- {{ item }}"
+      echo "Timestamp: $(date)"
+      echo "====================================================="
+      echo -e "\n\n\n"
+      bash -c "{{ item }}"
+    } >> /tmp/postcheck.txt 2>&1
+
+  loop: "{{ check_commands }}"

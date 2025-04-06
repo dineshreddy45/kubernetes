@@ -1,0 +1,14 @@
+---
+- name:  "prechecks of commands before patching"
+  shell:  |
+    touch /tmp/prechecks.txt
+    {
+      echo "====================================================="
+      echo "COMMAND:- {{ item }}"
+      echo "Timestamp: $(date)"
+      echo "====================================================="
+      echo -e "\n\n\n"
+      bash -c "{{ item }}"
+    } >> /tmp/prechecks.txt 2>&1
+
+  loop: "{{ check_commands }}"

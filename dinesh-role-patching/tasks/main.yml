@@ -1,2 +1,5 @@
 ---
 # tasks file for dinesh-role-patching
+- name: "patching execution order is Precheck,Snapshot,Patching,Postcheck"
+- include_tasks:  "{{ item }}"
+  loop:  [ precheck.yml, snapshot-pre-patching.yml, patching.yml, postcheck.yml ]

@@ -1,0 +1,39 @@
+---
+- name:  "Get IMDS token"
+  shell:  |
+    curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+         -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"
+  register:  my_token
+
+- name:  "Get instance ID"
+  shell:  |
+    curl -s -H "X-aws-ec2-metadata-token: {{ my_token.stdout }}" \
+         http://169.254.169.254/latest/meta-data/instance-id
+  register:  my_instance_id
+
+- name:  "Get region details"
+  shell:  |
+    curl -s -H "X-aws-ec2-metadata-token: {{ my_token.stdout }}" \
+        http://169.254.169.254/latest/dynamic/instance-identity/document | awk -F\" '/region/ {print $4}'
+  register:  my_region
+
+- name:  "Get root volume ID"
+  shell:  |
+    aws ec2 describe-instances \
+    --instance-id {{ my_instance_id.stdout }} \
+    --region {{ my_region.stdout }} \
+    --query "Reservations[0].Instances[0].BlockDeviceMappings[?DeviceName=='/dev/sda1'].Ebs.VolumeId" \
+    --output text
+  register: my_volume_id
+
+- name:  "Take snapshot"
+  shell:
+    aws ec2 create-snapshot \
+    --volume-id {{ my_volume_id.stdout }} \
+    --description "Snapshot before patching on {{ ansible_hostname }}" \
+    --region {{ my_region.stdout }}
+  register:  my_snapshot_id
+
+- name: "print out the snapshot id"
+  debug:
+    msg: "my snapshot id is :- {{ my_snapshot_id.stdout }}"

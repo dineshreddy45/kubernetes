@@ -1,2 +1,8 @@
 ---
 # vars file for dinesh-role-patching
+check_commands:
+  - df -hT
+  - systemctl list-units
+  - cat /etc/fstab
+  - cat /etc/resolv.conf
+  - cat /etc/rsyslog.d/remote.conf

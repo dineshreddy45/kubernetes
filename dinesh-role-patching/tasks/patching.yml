@@ -1,0 +1,11 @@
+---
+- name:  "Patching process"
+  zypper: 
+    update_cache:  yes
+    name:  '*'
+    state:  latest
+- name: "Reboot the server after patching"
+  reboot:
+    msg: "Rebooting after updates"
+    pre_reboot_delay: 10
+    reboot_timeout: 600
