@@ -1,0 +1,23 @@
+---
+- hosts:  all
+  gather_facts:  false
+  tasks:
+
+  - name:  "using register first time variable"
+    command:  |
+      cat /etc/fstab
+    register:  output
+
+  - name:  "Printing the output"
+    debug:
+      var:  output.stdout_lines
+
+  - name: "Second play where register variable is reused"
+    command:  
+      cat /etc/passwd
+    register:  extraction
+
+  - name:  "Printing the password file output"
+    debug:
+      var:  extraction.stdout_lines
+     

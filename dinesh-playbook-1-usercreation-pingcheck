@@ -1,0 +1,21 @@
+---
+
+- hosts: all
+  tasks:
+
+  - name: Doing a basic ping check
+    ping:
+
+  - name: Using the user module to created a user named sap in all the environments
+    user:
+      name: sap
+      shell: /bin/bash
+
+  - name: copying the existing contents in the target machine
+    command: |
+      touch file1
+  
+  - name:  Doing data copy
+    copy:
+      src:  /root/ansible/inventory
+      dest:  /root/file1

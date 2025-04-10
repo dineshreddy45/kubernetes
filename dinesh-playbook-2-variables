@@ -1,0 +1,12 @@
+---
+- hosts:  all
+  vars:
+    packages: 
+    - vsftpd
+    - net-tools
+    - tree
+  tasks:
+  - name:  "install multiple packages"
+    zypper:
+      name:  "{{ packages }}"
+      state:  installed
