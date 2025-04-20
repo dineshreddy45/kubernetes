@@ -1,0 +1,17 @@
+apiVersion:  v1
+kind:  Pod
+metadata:
+  name:  my-resource-pod
+  labels:
+    env:  dev
+spec:
+  containers:
+  - name:  stress-container
+    image:  polinux/stress
+    resources:
+      requests:
+        memory:  "100Mi"          #This is the lower bound value --> minimum how much the pod takes while deployment.
+      limits:
+        memory:  "200Mi"          #This is the upper bound value --> maximum how much a pod can take if the load is more than upper bound then the pod crashes.
+    command:  ["stress"]
+    args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
