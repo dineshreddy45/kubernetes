@@ -1,0 +1,39 @@
+apiVersion:  v1
+kind:  Pod
+metadata:
+  name:  liveness-pod
+  labels:
+    env:  dev
+spec:
+  containers:
+  - name:  liveness-container
+    image:  busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+          - cat
+          - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+#this means our application is initially deploying a container and creating a function which is file creation 
+#after 30 seconds we are deleting the file 
+#the liveness prob is checking the function of the app which is file is present or not for every 5 seconds
+#after 30 seconds pod restart will happen every 5 seconds because the file will not be found after 30 seconds
+ 
+#What Happens:
+#From 0–30 seconds, the file /tmp/healthy exists — so liveness probe succeeds.
+
+#After 30 seconds, the file is deleted.
+
+#The next liveness check (at ~35s) fails, so Kubernetes restarts the container.
+
+#This causes a loop:
+
+#Container restarts → creates the file again → survives for 30 seconds → file gets deleted → probe fails → restart again.
+
+   
